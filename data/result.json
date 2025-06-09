@@ -1,0 +1,16 @@
+[
+  {
+    "date": "2025-01-01",
+    "haMatch": true,
+    "contractMatch": true,
+    "backupStatus": "OK",
+    "overallStatus": "Green"
+  },
+  {
+    "date": "2025-01-02",
+    "haMatch": false,
+    "contractMatch": true,
+    "backupStatus": "Warning",
+    "overallStatus": "Yellow"
+  }
+]
