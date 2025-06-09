@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memory Card Game</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background: #f0f0f0;
+  padding: 20px;
+}
+#score {
+  margin-bottom: 20px;
+  font-size: 1.2em;
+}
+.memory-game {
+  display: grid;
+  grid-template-columns: repeat(4, 100px);
+  grid-gap: 10px;
+  justify-content: center;
+}
+.card {
+  width: 100px;
+  height: 100px;
+  perspective: 1000px;
+  cursor: pointer;
+}
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+.card.flipped .card-inner {
+  transform: rotateY(180deg);
+}
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  border: 2px solid #333;
+  border-radius: 8px;
+  background: white;
+}
+.card-front {
+  background: #ccc;
+}
+.card-back {
+  transform: rotateY(180deg);
+}
+</style>
+</head>
+<body>
+<h1>Memory Card Game</h1>
+<div id="score">Pairs matched: <span id="matched-count">0</span>/6</div>
+<div class="memory-game" id="game"></div>
+<script>
+const symbols = ['🍎','🍌','🍓','🍇','🍉','🍍'];
+let cards = symbols.concat(symbols) // duplicate to create pairs
+  .sort(() => 0.5 - Math.random());
+const game = document.getElementById('game');
+const matchedCount = document.getElementById('matched-count');
+let firstCard = null;
+let lockBoard = false;
+let matches = 0;
+
+cards.forEach(symbol => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.dataset.symbol = symbol;
+  card.innerHTML = `<div class="card-inner">
+    <div class="card-face card-front"></div>
+    <div class="card-face card-back">${symbol}</div>
+  </div>`;
+  card.addEventListener('click', flipCard);
+  game.appendChild(card);
+});
+
+function flipCard() {
+  if (lockBoard || this === firstCard || this.classList.contains('matched')) return;
+  this.classList.add('flipped');
+  if (!firstCard) {
+    firstCard = this;
+    return;
+  }
+  if (this.dataset.symbol === firstCard.dataset.symbol) {
+    this.classList.add('matched');
+    firstCard.classList.add('matched');
+    matches++;
+    matchedCount.textContent = matches;
+    if (matches === symbols.length) {
+      setTimeout(() => alert('You win!'), 300);
+    }
+    firstCard = null;
+  } else {
+    lockBoard = true;
+    setTimeout(() => {
+      this.classList.remove('flipped');
+      firstCard.classList.remove('flipped');
+      firstCard = null;
+      lockBoard = false;
+    }, 800);
+  }
+}
+</script>
+</body>
+</html>
