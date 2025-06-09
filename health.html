@@ -16,10 +16,19 @@
     th, td {
       padding: 8px 12px;
       border: 1px solid #ccc;
-      text-align: left;
+      text-align: center;
     }
     th {
       background-color: #f2f2f2;
+    }
+    .status-green {
+      background-color: #e7f9e9;
+    }
+    .status-yellow {
+      background-color: #fffbe6;
+    }
+    .status-red {
+      background-color: #fdecea;
     }
   </style>
 </head>
@@ -48,10 +57,12 @@
         const tbody = document.querySelector('#result-table tbody');
         data.forEach(item => {
           const tr = document.createElement('tr');
+          const statusClass = `status-${item.overallStatus.toLowerCase()}`;
+          tr.classList.add(statusClass);
           tr.innerHTML = `
-            <td>${item.date}</td>
-            <td>${item.haMatch ? 'Yes' : 'No'}</td>
-            <td>${item.contractMatch ? 'Yes' : 'No'}</td>
+            <td style="text-align:left">${item.date}</td>
+            <td>${item.haMatch ? '✅' : '❌'}</td>
+            <td>${item.contractMatch ? '✅' : '❌'}</td>
             <td>${item.backupStatus}</td>
             <td>${item.overallStatus}</td>
           `;
