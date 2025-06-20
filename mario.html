@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Mario Jump</title>
+  <style>
+    body {
+      margin: 0;
+      background: #5c94fc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    canvas {
+      background: linear-gradient(#5c94fc, #8fd0fc);
+      border: 2px solid #333;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game" width="800" height="300"></canvas>
+  <script>
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+
+    const groundHeight = 50;
+    let mario = {
+      x: 50,
+      y: canvas.height - groundHeight - 40,
+      width: 40,
+      height: 40,
+      vy: 0,
+      jumping: false
+    };
+    let pipes = [];
+    let frame = 0;
+    let score = 0;
+    let gameOver = false;
+
+    function spawnPipe() {
+      pipes.push({
+        x: canvas.width,
+        y: canvas.height - groundHeight - 60,
+        width: 40,
+        height: 60
+      });
+    }
+
+    function update() {
+      if (gameOver) return;
+      frame++;
+
+      mario.vy += 1.2; // gravity
+      mario.y += mario.vy;
+
+      if (mario.y > canvas.height - groundHeight - mario.height) {
+        mario.y = canvas.height - groundHeight - mario.height;
+        mario.vy = 0;
+        mario.jumping = false;
+      }
+
+      if (frame % 150 === 0) spawnPipe();
+
+      pipes.forEach(pipe => { pipe.x -= 3; });
+
+      if (pipes.length && pipes[0].x + pipes[0].width < 0) {
+        pipes.shift();
+        score++;
+      }
+
+      pipes.forEach(pipe => {
+        if (mario.x < pipe.x + pipe.width &&
+            mario.x + mario.width > pipe.x &&
+            mario.y < pipe.y + pipe.height &&
+            mario.y + mario.height > pipe.y) {
+          gameOver = true;
+        }
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#59c73b';
+      ctx.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
+
+      ctx.fillStyle = 'red';
+      ctx.fillRect(mario.x, mario.y, mario.width, mario.height);
+
+      ctx.fillStyle = 'green';
+      pipes.forEach(pipe => {
+        ctx.fillRect(pipe.x, pipe.y, pipe.width, pipe.height);
+      });
+
+      ctx.fillStyle = '#fff';
+      ctx.font = '20px Arial';
+      ctx.fillText('Score: ' + score, 10, 25);
+
+      if (gameOver) {
+        ctx.fillStyle = 'black';
+        ctx.font = '40px Arial';
+        ctx.fillText('Game Over', canvas.width / 2 - 100, canvas.height / 2);
+        ctx.font = '20px Arial';
+        ctx.fillText('Refresh to play again', canvas.width / 2 - 100, canvas.height / 2 + 30);
+      }
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    document.addEventListener('keydown', e => {
+      if ((e.code === 'Space' || e.code === 'ArrowUp') && !mario.jumping && !gameOver) {
+        mario.vy = -18;
+        mario.jumping = true;
+      }
+    });
+
+    loop();
+  </script>
+</body>
+</html>
